@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { FaYoutube, FaSearch, FaMicrophone, FaBars } from "react-icons/fa"
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const Navbar = ({ showSidebar, setShowSidebar, isMobile }) => {
   const [search, setSearch] = useState("")
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
   const searchRef = useRef(null)
 
   const handleSearch = () => {
@@ -17,9 +18,14 @@ const Navbar = ({ showSidebar, setShowSidebar, isMobile }) => {
     }
   }
 
-  // Toggle sidebar function - works on both mobile and desktop
   const toggleSidebar = () => {
     setShowSidebar(!showSidebar)
+  }
+
+  // Go to home page when logo is clicked
+  const goToHome = () => {
+    navigate('/')
+    setSearch("")
   }
 
   // Get search suggestions
@@ -38,11 +44,7 @@ const Navbar = ({ showSidebar, setShowSidebar, isMobile }) => {
         setSuggestions(data[1] || [])
       } catch (error) {
         console.log("Suggestions error:", error)
-        setSuggestions([
-          `${search} tutorial`,
-          `${search} song`,
-          `${search} video`
-        ])
+        setSuggestions([])
       }
     }
 
@@ -65,30 +67,30 @@ const Navbar = ({ showSidebar, setShowSidebar, isMobile }) => {
   }, [])
 
   return (
-    <div className='flex items-center justify-between px-3 sm:px-4 py-3 bg-black sticky top-0 z-50 border-b border-zinc-800'>
+    <div className='flex items-center justify-between px-4 py-3 bg-black sticky top-0 z-50 border-b border-zinc-800'>
       {/* Left Section */}
-      <div className='flex items-center gap-3 sm:gap-5'>
+      <div className='flex items-center gap-5'>
         <FaBars
           onClick={toggleSidebar}
-          className='text-white text-xl sm:text-2xl cursor-pointer hover:text-gray-300 transition'
+          className='text-white text-xl cursor-pointer hover:text-gray-300'
         />
         <div
           className='flex items-center gap-1 cursor-pointer'
-          onClick={() => navigate("/")}
+          onClick={goToHome}  // Navigate to home on click
         >
-          <FaYoutube className='text-red-600 text-3xl sm:text-4xl' />
-          <h1 className='text-white text-lg sm:text-2xl font-semibold hidden sm:block'>
+          <FaYoutube className='text-red-600 text-4xl' />
+          <h1 className='text-white text-2xl font-semibold hidden sm:block'>
             YouTube
           </h1>
         </div>
       </div>
 
-      {/* Center Search Section - Responsive */}
-      <div className='flex items-center w-full max-w-md sm:max-w-xl lg:max-w-2xl mx-2 sm:mx-4' ref={searchRef}>
+      {/* Center Search Section */}
+      <div className='flex items-center w-full max-w-2xl mx-4' ref={searchRef}>
         <div className='flex w-full relative'>
           <input
             type="text"
-            placeholder={isMobile ? "Search..." : "Search"}
+            placeholder='Search'
             value={search}
             onChange={(e) => {
               setSearch(e.target.value)
@@ -96,18 +98,18 @@ const Navbar = ({ showSidebar, setShowSidebar, isMobile }) => {
             }}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             onFocus={() => setShowSuggestions(true)}
-            className='w-full px-3 sm:px-4 py-1.5 sm:py-2 bg-black border border-zinc-700 rounded-l-full outline-none text-white text-sm sm:text-base focus:border-blue-500'
+            className='w-full px-4 py-2 bg-black border border-zinc-700 rounded-l-full outline-none text-white focus:border-blue-500'
           />
           <button
             onClick={handleSearch}
-            className='px-3 sm:px-6 bg-zinc-800 border border-zinc-700 rounded-r-full text-white cursor-pointer hover:bg-zinc-700 transition'
+            className='px-6 bg-zinc-800 border border-zinc-700 rounded-r-full text-white cursor-pointer hover:bg-zinc-700'
           >
-            <FaSearch className="text-sm sm:text-base" />
+            <FaSearch />
           </button>
 
           {/* Search Suggestions Dropdown */}
           {showSuggestions && suggestions.length > 0 && (
-            <div className='absolute top-10 sm:top-12 left-0 w-full bg-zinc-900 rounded-xl overflow-hidden shadow-lg z-50 border border-zinc-700'>
+            <div className='absolute top-12 left-0 w-full bg-zinc-900 rounded-xl overflow-hidden shadow-lg z-50 border border-zinc-700'>
               {suggestions.map((item, index) => (
                 <div
                   key={index}
@@ -117,25 +119,24 @@ const Navbar = ({ showSidebar, setShowSidebar, isMobile }) => {
                     setShowSuggestions(false)
                     navigate(`/search/${item}`)
                   }}
-                  className='px-3 sm:px-4 py-2 sm:py-3 hover:bg-zinc-800 cursor-pointer text-white flex items-center gap-2 sm:gap-3 text-sm sm:text-base'
+                  className='px-4 py-3 hover:bg-zinc-800 cursor-pointer text-white flex items-center gap-3'
                 >
-                  <FaSearch className='text-gray-400 text-xs sm:text-sm' />
-                  <span className="truncate">{item}</span>
+                  <FaSearch className='text-gray-400 text-sm' />
+                  <span>{item}</span>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Microphone button - hide on very small screens */}
-        <button className='ml-2 sm:ml-3 p-2 sm:p-3 bg-zinc-900 rounded-full text-white cursor-pointer hover:bg-zinc-800 transition hidden xs:block'>
-          <FaMicrophone className="text-sm sm:text-base" />
+        <button className='ml-3 p-3 bg-zinc-900 rounded-full text-white cursor-pointer hover:bg-zinc-800'>
+          <FaMicrophone />
         </button>
       </div>
 
       {/* Right Section */}
-      <div className='flex items-center gap-2 sm:gap-4'>
-        <div className='w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-red-500 flex items-center justify-center text-white font-bold cursor-pointer hover:bg-red-600 transition text-sm sm:text-base'>
+      <div className='flex items-center gap-4'>
+        <div className='w-9 h-9 rounded-full bg-red-500 flex items-center justify-center text-white font-bold cursor-pointer hover:bg-red-600'>
           A
         </div>
       </div>

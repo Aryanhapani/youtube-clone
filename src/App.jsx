@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
 import Home from './pages/Home'
@@ -7,7 +7,7 @@ import Search from './pages/Search'
 import Video from './pages/Video'
 
 function App() {
-  const [showSidebar, setShowSidebar] = useState(true) // Start with true on desktop
+  const [showSidebar, setShowSidebar] = useState(true)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024)
 
   useEffect(() => {
@@ -16,10 +16,8 @@ function App() {
       setIsMobile(mobile)
       
       if (!mobile) {
-        // On desktop/laptop, keep sidebar visible
         setShowSidebar(true)
       } else {
-        // On mobile, hide sidebar by default
         setShowSidebar(false)
       }
     }
@@ -38,22 +36,24 @@ function App() {
           isMobile={isMobile}
         />
         <div className='flex flex-1 overflow-hidden relative'>
-          {/* Sidebar */}
           <Sidebar 
             showSidebar={showSidebar} 
             setShowSidebar={setShowSidebar}
             isMobile={isMobile}
           />
           
-          {/* Main Content */}
           <div className={`
             flex-1 overflow-auto transition-all duration-300
             ${isMobile && showSidebar ? 'blur-sm' : 'blur-0'}
           `}>
             <Routes>
+              {/* Default route - Home page */}
               <Route path="/" element={<Home />} />
+              <Route path="/home" element={<Home />} />
               <Route path="/search/:searchTerm" element={<Search />} />
               <Route path="/video/:id" element={<Video />} />
+              {/* Redirect any unknown routes to Home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
         </div>
